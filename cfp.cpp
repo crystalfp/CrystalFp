@@ -552,10 +552,12 @@ int main(int ac, char **av)
 		}
 	}
 
+	// Creaste the corresponding scatterplot
 	if(cmd.mCreateScatterplot)
 	{
 		if(cmd.mVerboseLevel >= 1) std::cerr << std::endl << "Start creating scatterplot" << std::endl;
 
+		// Create the scatterplot object and set few default values
 		CrystalFpScatterplot sp;
 		unsigned int num_retries = 1;
 		float		 min_energy = 1e-6F;
@@ -564,7 +566,7 @@ int main(int ac, char **av)
 		CrystalFpScatterplot::DiagnosticType diagnostic_type = CrystalFpScatterplot::DIAG_BINNED_DISTANCES;
 		float timestep = 0.02F;
 
-		// Set parameters
+		// Set parameters from command line
 		for(std::map<std::string,std::string>::const_iterator im=cmd.mScatterplotParams.begin(); im != cmd.mScatterplotParams.end(); ++im)
 		{
 			if(!strncasecmp(im->first.c_str(), "retry", 1))
@@ -595,6 +597,7 @@ int main(int ac, char **av)
 			}
 		}
 
+		// Recap the scatterplot values
 		if(cmd.mVerboseLevel >= 1)
 		{
 			sp.dumpParams();
@@ -606,21 +609,25 @@ int main(int ac, char **av)
 			std::cerr << "Timestep:       " << std::setw(12) << timestep << std::endl;
 		}
 
+		// Initialize the scatterplot and run it the required number of retries
 		unsigned int npoints = sp.initScatterplot(&cfp);
 		unsigned int i, j;
 		for(i=0; i < num_retries; ++i)
 		{
 			if(cmd.mVerboseLevel >= 1) std::cerr << std::endl << "Start retry " << i << std::endl;
 
+			// Iterate and stop on energy or num. iterations criterias
 			for(j=0; j < max_iterations; ++j)
 			{
 				float energy = sp.stepScatterplot(timestep);
 				if(energy < min_energy) break;
 			}
+
+			// Perturb the point position to run another retry
 			if(num_retries > 1) sp.perturbPositions();
 		}
 
-		// Output the values on file (well does not make much sense not to have this set)
+		// Output the values on file (well, does not make much sense not to have this set)
 		if(cmd.mScatterplotFile)
 		{
 			// Create the analysis results file

@@ -209,6 +209,7 @@
 /// 
 /// @endcode
 
+
 /// @page ex_page Usage example
 ///
 /// @code
@@ -246,7 +247,6 @@
 ///
 
 
-
 /// @page fmt_page Output file formats
 ///
 /// @section fmt_fp_sect Binary output for fingerprints
@@ -255,9 +255,9 @@
 /// numfp (int) Number of structures (i.e. the number of fingerprints)\n
 /// nparts (int) Number of parts of each fingerprint\n
 /// fp1 (fplen*float) First fingerprint\n
-/// fp2 (fplen*float) First fingerprint\n
+/// fp2 (fplen*float) Next fingerprint\n
 /// ...\n
-/// fp(numfp) (fplen*float) First fingerprint\n
+/// fp(numfp) (fplen*float) Last fingerprint\n
 ///
 ///
 /// @section fmt_dist_sect Binary output for distance matrix
@@ -278,7 +278,7 @@
 /// Filename encodes the StepId:\n
 ///		FPP%010d.dat (positive StepId)
 ///		FPN%010d.dat (negative StepId)
-/// The StepId absolute value goes in the ten digits.
+/// The StepId absolute value goes in the ten digits zero padded field.
 ///
 ///	step (int) StepId value\n
 /// fingerprint_total_length (unsigned int) Total length of the fingerprint\n
