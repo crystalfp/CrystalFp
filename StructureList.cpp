@@ -1,6 +1,7 @@
 
 #include <map>
 #include <iostream>
+#include <fstream>
 #include "Structure.h"
 #include "StructureList.h"
 #include "CrystalFpExceptions.h"
@@ -85,3 +86,43 @@ void StructureList::selectAllIncluded(const std::vector<bool>& aIncluded)
 	}
 	mStructuresDirectory = temp_structures_directory;
 }
+
+
+void StructureList::serialize(std::ofstream& aStream) const
+{
+	// Write number of structures
+	unsigned int ns = mStructuresDirectory.size();
+	aStream.write((char *)&ns, sizeof(unsigned int));
+
+	// Write the included (or selected) structures
+	unsigned int idx;
+	for(idx=0; idx < ns; ++idx)
+	{
+		mStructuresDirectory[idx]->second.serialize(aStream);
+	}
+}
+
+
+void StructureList::unserialize(std::ifstream& aStream, bool aAppend, int aStepOffset)
+{
+	// Read the number of structures
+	unsigned int ns;
+	aStream.read((char *)&ns, sizeof(unsigned int));
+
+	// Recreate the structures list (empting it if no append required)
+	if(!aAppend) mStructures.clear();
+
+	unsigned int idx;
+	for(idx=0; idx < ns; ++idx)
+	{
+		Structure s;
+		s.unserialize(aStream);
+
+		if(aAppend) s.mStepId += aStepOffset;
+		mStructures.insert(std::pair<int,Structure>(s.mStepId, s));
+	}
+	mStructuresDirectory.clear();
+	std::map<int,Structure>::iterator im;
+	for(im=mStructures.begin(); im != mStructures.end(); ++im) mStructuresDirectory.push_back(im);
+}
+

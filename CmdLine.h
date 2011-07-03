@@ -69,6 +69,7 @@ public:
 	std::map<std::string,std::string> mScatterplotParams;	///< Pairs of parameter-name parameter-value for the analysis algorithm
 	const char*					mScatterplotFile;			///< Output file for the scatterplot points
 	const char*					mDiagnosticFile;			///< Output file for the diagnostic chart for the current scatterplot
+	const char*					mSerializeFile;				///< Serialize the class to this file
 
 
 	static const unsigned int NO_METHOD_SELECTED = UINT_MAX;

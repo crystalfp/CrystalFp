@@ -65,6 +65,8 @@
 ///
 /// Ex: addStructureBatch
 ///
+/// There is one exception: when the function mimics some well know one like size(), clean(), serialize().
+///
 /// @section cmemb_sect Class data members
 /// Class member variables names start with 'm' followed by CamelCase name.
 ///
@@ -297,4 +299,14 @@
 ///
 /// CMAKE generates other two targets:
 /// "doc" generates the library interface documentation. Instead "devdoc" generates documentation for the developers for all sources.
+///
+
+
+/// @page future_page Future and to do
+///
+/// Create the serialize/unserialize mechanism for CrystalFp class.
+///
+/// Enable reading of VASP poscar + elements
+/// 
+/// Put more formats readers
 ///

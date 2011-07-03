@@ -144,3 +144,71 @@ float Structure::getMaxDiagonalLength(void) const
 	// Return the maximum value
 	return sqrt(max_basis_len);
 }
+
+#include <iostream>
+
+void Structure::serialize(std::ofstream& aStream) const
+{
+	aStream.write((char *)&mStepId, sizeof(int));
+	aStream.write((char *)&mNumAtoms, sizeof(unsigned int));
+	if(mNumAtoms) aStream.write((char *)&mCoordinates[0], sizeof(float)*3*mNumAtoms);
+	if(mNumAtoms) aStream.write((char *)&mAtomZ[0], sizeof(unsigned int)*mNumAtoms);
+	aStream.write((char *)mUnitCell, sizeof(float)*16);
+	aStream.write((char *)&mEnergyPerAtom, sizeof(float));
+	unsigned int x = (mHasEnergy) ? 1 : 0;
+	aStream.write((char *)&x, sizeof(unsigned int));
+	aStream.write((char *)&mFingerprintSectionLen, sizeof(unsigned int));
+	aStream.write((char *)&mFingerprintNumSections, sizeof(unsigned int));
+	if(mFingerprintSectionLen > 0 && mFingerprintNumSections > 0)
+		aStream.write((char *)&mFingerprint[0], sizeof(float)*mFingerprintSectionLen*mFingerprintNumSections);
+	x = mWeights.size();
+	aStream.write((char *)&x, sizeof(unsigned int));
+	if(x) aStream.write((char *)&mWeights[0], sizeof(float)*x);
+	x = mInteratomicDistances.size();
+	aStream.write((char *)&x, sizeof(unsigned int));
+	unsigned int i;
+	for(i=0; i < x; ++i)
+	{
+		unsigned int y = mInteratomicDistances[i].size();
+		aStream.write((char *)&y, sizeof(unsigned int));
+		if(y) aStream.write((char *)&mInteratomicDistances[i][0], sizeof(float)*y);
+	}
+}
+
+void Structure::unserialize(std::ifstream& aStream)
+{
+	aStream.read((char *)&mStepId, sizeof(int));
+	aStream.read((char *)&mNumAtoms, sizeof(unsigned int));
+	mCoordinates.resize(3*mNumAtoms);
+	if(mNumAtoms) aStream.read((char *)&mCoordinates[0], sizeof(float)*3*mNumAtoms);
+	mAtomZ.resize(mNumAtoms);
+	if(mNumAtoms) aStream.read((char *)&mAtomZ[0], sizeof(unsigned int)*mNumAtoms);
+	aStream.read((char *)mUnitCell, sizeof(float)*16);
+	aStream.read((char *)&mEnergyPerAtom, sizeof(float));
+	unsigned int x;
+	aStream.read((char *)&x, sizeof(unsigned int));
+	mHasEnergy = (x != 0);
+	aStream.read((char *)&mFingerprintSectionLen, sizeof(unsigned int));
+	aStream.read((char *)&mFingerprintNumSections, sizeof(unsigned int));
+	mFingerprint.resize(mFingerprintSectionLen*mFingerprintNumSections);
+	if(mFingerprintSectionLen > 0 && mFingerprintNumSections > 0)
+		aStream.read((char *)&mFingerprint[0], sizeof(float)*mFingerprintSectionLen*mFingerprintNumSections);
+	aStream.read((char *)&x, sizeof(unsigned int));
+	mWeights.resize(x);
+	if(x) aStream.read((char *)&mWeights[0], sizeof(float)*x);
+	aStream.read((char *)&x, sizeof(unsigned int));
+	mInteratomicDistances.reserve(x);
+	for(unsigned int i=0; i < x; ++i)
+	{
+		std::vector<float> v;
+		mInteratomicDistances.push_back(v);
+
+		unsigned int y;
+		aStream.read((char *)&y, sizeof(unsigned int));
+
+		mInteratomicDistances[i].resize(y);
+		if(y) aStream.read((char *)&mInteratomicDistances[i][0], sizeof(float)*y);
+	}
+}
+
+

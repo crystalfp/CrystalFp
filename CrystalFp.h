@@ -489,6 +489,29 @@ public:
 	//@}
 
 
+	//###################################################################################
+	/// @name Serialize/unserialize class
+	///  Serialize/unserialize class
+	//@{
+
+	/// Serialize the class to the given binary stream
+	///
+	/// @param[in] aStream The stream to which the class will be serialized
+	///
+	/// @exception CrystalFpFatal On write error.
+	///
+	void serialize(std::ofstream& aStream) const;
+
+	/// Unserialize the class from the given binary stream
+	///
+	/// @param[in] aStream The stream from which the class should be deserialized
+	///
+	/// @exception CrystalFpFatal On read error and on format validation error.
+	///
+	void unserialize(std::ifstream& aStream, bool aAppend=false, int aStepOffset=10000);
+
+	//@}
+
 private:
 	CrystalFp(const CrystalFp&);
 	CrystalFp& operator=(const CrystalFp&);

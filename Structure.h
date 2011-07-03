@@ -26,6 +26,11 @@ public:
 	Structure(const Structure& p);
 	Structure& operator=(const Structure& p);
 
+	// Serialize/unserialize structure
+	void serialize(std::ofstream& aStream) const;
+	void unserialize(std::ifstream& aStream);
+
+
 public:
 	// Structure description data
 	int							mStepId;					///< Step number (it is an identifier)

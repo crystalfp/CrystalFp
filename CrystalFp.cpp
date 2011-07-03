@@ -1013,3 +1013,130 @@ const std::vector< std::set<unsigned int> >& CrystalFp::getGroups(void) const
 {
 	return mPimpl->mGroupedResults;
 }
+
+// For the class serialize
+#define FORMAT_VERSION			1
+#define MAGIC_LEN				32
+#define MAGIC_STRING			"CrystalFpSerialize"
+#if defined(__LP64__) || defined(_LP64)
+#define MAGIC_NUMBER			0x466C617473797243	// "CrystalF" as size_t
+#else
+#define MAGIC_NUMBER			0x73797243			// "Crys" as size_t
+#endif
+
+void CrystalFp::serialize(std::ofstream& aStream) const
+{
+	// Write the header line in the file (length will be 32 bytes null padded)
+	char magic[MAGIC_LEN];
+	memset(magic, 0, MAGIC_LEN);
+	sprintf(magic, "%s V%d\n", MAGIC_STRING, FORMAT_VERSION);
+	aStream.write(magic, MAGIC_LEN);
+
+	// Write number of structures and the structures themself
+	mPimpl->mSL.serialize(aStream);
+
+	aStream.write((char *)&mPimpl->mCutoffDistance, sizeof(float));
+	unsigned int x = (mPimpl->mIsNanocluster) ? 1 : 0;
+	aStream.write((char *)&x, sizeof(unsigned int));
+	aStream.write((char *)&mPimpl->mDiffrBinSize, sizeof(float));
+	aStream.write((char *)&mPimpl->mDiffrPeakSize, sizeof(float));
+	aStream.write((char *)&mPimpl->mForcedFpLen, sizeof(unsigned int));
+	x = mPimpl->mCheckpointDir.size();
+	aStream.write((char *)&x, sizeof(unsigned int));
+	if(x) aStream.write(mPimpl->mCheckpointDir.c_str(), x);
+	aStream.write((char *)&mPimpl->mFingerprintMethodIdx, sizeof(unsigned int));
+	aStream.write((char *)&mPimpl->mDistanceMethodIdx, sizeof(unsigned int));
+	aStream.write((char *)&mPimpl->mGroupingMethodIdx, sizeof(unsigned int));
+	aStream.write((char *)&mPimpl->mK, sizeof(unsigned int));
+	aStream.write((char *)&mPimpl->mMaxDistanceForGrouping, sizeof(float));
+	aStream.write((char *)&mPimpl->mNumGroupedEntries, sizeof(unsigned int));
+	aStream.write((char *)&mPimpl->mNumSingleEntries, sizeof(unsigned int));
+	mPimpl->mDistanceMatrix.serialize(aStream);
+	x = mPimpl->mGroupedResults.size();
+	aStream.write((char *)&x, sizeof(unsigned int));
+	for(unsigned int i=0; i < x; ++i)
+	{
+		unsigned int y = mPimpl->mGroupedResults.size();
+		aStream.write((char *)&y, sizeof(unsigned int));
+		std::set<unsigned int>::const_iterator is;
+		for(is=mPimpl->mGroupedResults[i].begin(); is != mPimpl->mGroupedResults[i].end(); ++is)
+		{
+			unsigned int z = *is;
+			aStream.write((char *)&z, sizeof(unsigned int));
+		}
+	}
+}
+
+
+void CrystalFp::unserialize(std::ifstream& aStream, bool aAppend, int aStepOffset)
+{
+	// Verify the magic number
+	size_t magic_number;
+	aStream.read((char *)&magic_number, sizeof(size_t));
+	if(magic_number != MAGIC_NUMBER)
+	{
+		aStream.close();
+		throw CrystalFpFatal("Invalid magic number for save file to be reloaded");
+	}
+
+	// Verify version
+	char magic[MAGIC_LEN];
+	aStream.read(magic, MAGIC_LEN-sizeof(size_t));
+	int file_version = atoi(magic+sizeof(MAGIC_STRING)-sizeof(size_t)+1);
+	if(file_version != FORMAT_VERSION)
+	{
+		aStream.close();
+		std::cerr << "Invalid version for save file to be reloaded" << std::endl;
+		std::cerr << "Version is: " << file_version << " instead of: " << FORMAT_VERSION << std::endl;
+		throw CrystalFpFatal();
+	}
+
+	// Read the set of Structures
+	mPimpl->mSL.unserialize(aStream, aAppend, aStepOffset);
+
+	unsigned int x;
+	aStream.read((char *)&mPimpl->mCutoffDistance, sizeof(float));
+	aStream.read((char *)&x, sizeof(unsigned int));
+	mPimpl->mIsNanocluster = (x != 0);
+	aStream.read((char *)&mPimpl->mDiffrBinSize, sizeof(float));
+	aStream.read((char *)&mPimpl->mDiffrPeakSize, sizeof(float));
+	aStream.read((char *)&mPimpl->mForcedFpLen, sizeof(unsigned int));
+	aStream.read((char *)&x, sizeof(unsigned int));
+	if(x)
+	{
+		char *str = new char[x];
+		aStream.read(str, x);
+		mPimpl->mCheckpointDir.assign(str, x);
+		delete [] str;
+	}
+	else
+	{
+		mPimpl->mCheckpointDir.clear();
+	}
+	aStream.read((char *)&mPimpl->mFingerprintMethodIdx, sizeof(unsigned int));
+	aStream.read((char *)&mPimpl->mDistanceMethodIdx, sizeof(unsigned int));
+	aStream.read((char *)&mPimpl->mGroupingMethodIdx, sizeof(unsigned int));
+	aStream.read((char *)&mPimpl->mK, sizeof(unsigned int));
+	aStream.read((char *)&mPimpl->mMaxDistanceForGrouping, sizeof(float));
+	aStream.read((char *)&mPimpl->mNumGroupedEntries, sizeof(unsigned int));
+	aStream.read((char *)&mPimpl->mNumSingleEntries, sizeof(unsigned int));
+	mPimpl->mDistanceMatrix.unserialize(aStream);
+	aStream.read((char *)&x, sizeof(unsigned int));
+	mPimpl->mGroupedResults.clear();
+	for(unsigned int i=0; i < x; ++i)
+	{
+		std::set<unsigned int> s;
+		s.clear();
+		unsigned int y;
+		aStream.read((char *)&y, sizeof(unsigned int));
+		for(unsigned int j=0; j < y; ++j)
+		{
+			unsigned int z;
+			aStream.read((char *)&z, sizeof(unsigned int));
+			s.insert(z);
+		}
+		mPimpl->mGroupedResults.push_back(s);
+	}
+}
+
+

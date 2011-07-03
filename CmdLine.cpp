@@ -130,6 +130,7 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 		mCreateScatterplot			= false;
 		mScatterplotFile			= 0;
 		mDiagnosticFile				= 0;
+		mSerializeFile				= 0;
 
 		return;
 	}
@@ -172,6 +173,7 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 	mCreateScatterplot			= false;
 	mScatterplotFile			= 0;
 	mDiagnosticFile				= 0;
+	mSerializeFile				= 0;
 
 	// Setup the command line parser
 	enum {
@@ -206,7 +208,8 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 		OPT_SCATTER,
 		OPT_SCATTER_FILE,
 		OPT_SCATTER_PARAM,
-		OPT_DIAGNOSTIC_FILE
+		OPT_DIAGNOSTIC_FILE,
+		OPT_SERIALIZE
 	};
 
 	CSimpleOpt::SOption parser_options[] = {
@@ -277,6 +280,8 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 		{ OPT_DIAGNOSTIC_FILE,	"--diagnostic-file",		SO_REQ_SEP, "" },
 		{ OPT_SCATTER_PARAM,	"-sp",						SO_MULTI,	"Pass one parameter for the scatterplot as: code value (code: retry, energy, iterations, kind, diagnostic, timestep, mass, stiffness, damping, perturb, bins, wobble)" },
 		{ OPT_SCATTER_PARAM,	"--scatterplot-param",		SO_MULTI,	"" },
+		{ OPT_SERIALIZE,		"-sa",						SO_REQ_SEP, "Save the current CrystalFp class to the given file" },
+		{ OPT_SERIALIZE,		"--save-file",				SO_REQ_SEP, "" },
 		SO_END_OF_OPTIONS
 	};
 
@@ -505,6 +510,10 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 
 		case OPT_DIAGNOSTIC_FILE:
 			mDiagnosticFile = args.OptionArg();
+			break;
+
+		case OPT_SERIALIZE:
+			mSerializeFile = args.OptionArg();
 			break;
 		}
 	}

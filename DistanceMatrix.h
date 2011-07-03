@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <fstream>
 #include "CrystalFpExceptions.h"
 
 class DistanceMatrix
@@ -178,6 +179,25 @@ public:
 	{
 		mDistances.clear();
 		mNumElements = 0;
+	}
+
+	
+	void serialize(std::ofstream& aStream) const
+	{
+		unsigned int x = mDistances.size();
+		aStream.write((char *)&x, sizeof(unsigned int));
+		if(x) aStream.write((char *)&mDistances[0], sizeof(float)*x);
+		aStream.write((char *)&mNumElements, sizeof(unsigned int));
+	}
+
+
+	void unserialize(std::ifstream& aStream)
+	{
+		unsigned int x;
+		aStream.read((char *)&x, sizeof(unsigned int));
+		mDistances.resize(x);
+		if(x) aStream.read((char *)&mDistances[0], sizeof(float)*x);
+		aStream.read((char *)&mNumElements, sizeof(unsigned int));
 	}
 
 private:

@@ -701,6 +701,39 @@ int main(int ac, char **av)
 		}
 	}
 
+	// Serialize the CrystalFp class to file
+	if(cmd.mSerializeFile)
+	{
+		if(cmd.mVerboseLevel >= 1) std::cerr << std::endl << "Start serializing content" << std::endl;
+		std::ofstream serialized(cmd.mSerializeFile, std::ios_base::binary | std::ios_base::trunc | std::ios_base::out);
+		if(!serialized.good())
+		{
+			std::cerr << "Cannot create serialized file <" << cmd.mSerializeFile << ">" << std::endl;
+		}
+		else
+		{
+			cfp.serialize(serialized);
+			serialized.close();
+		}
+		if(cmd.mVerboseLevel >= 1) std::cerr << "End serializing content" << std::endl;
+
+		// TEST
+		if(cmd.mVerboseLevel >= 1) std::cerr << "Try to deserialize content" << std::endl;
+
+		CrystalFp xcfp(cmd.mVerboseLevel);
+		std::ifstream unserialized(cmd.mSerializeFile, std::ios_base::binary | std::ios_base::in);
+		if(!unserialized.good())
+		{
+			std::cerr << "Cannot open serialized file <" << cmd.mSerializeFile << ">" << std::endl;
+		}
+		else
+		{
+			cfp.unserialize(unserialized);
+			unserialized.close();
+		}
+		if(cmd.mVerboseLevel >= 1) std::cerr << "End deserializing content" << std::endl;
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// Catch all exceptions
 	}
