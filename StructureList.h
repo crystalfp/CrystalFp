@@ -44,6 +44,8 @@ public:
 	Structure& getStructureBySequence(int aSequence);
 	Structure& getStructureByIndex(unsigned int aIdx);
 
+	void serialize(std::ofstream& aStream) const;
+	void unserialize(std::ifstream& aStream, bool aAppend=false, int aStepOffset=10000);
 
 private:
 	std::map<int, Structure> mStructures;
