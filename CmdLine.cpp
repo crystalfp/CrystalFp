@@ -177,6 +177,7 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 
 	// Setup the command line parser
 	enum {
+		OPT_VERSION,
 		OPT_VERBOSE,
 		OPT_HELP,
 		OPT_TYPES,
@@ -213,6 +214,7 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 	};
 
 	CSimpleOpt::SOption parser_options[] = {
+		{ OPT_VERSION,			"--version",				SO_NONE, 	"Library and driver version" },
 		{ OPT_VERBOSE,			"-v",						SO_OPT, 	"Verbose level (if no argument, defaults to 1)" },
 		{ OPT_VERBOSE,			"--verbose",				SO_OPT, 	"" },
 		{ OPT_HELP,				"-?",						SO_NONE,    "This help" },
@@ -311,6 +313,12 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 
 		switch(args.OptionId())
 		{
+		case OPT_VERSION:
+			// Get the last commit date from Git using: git log -n -pretty=format:"%ci"
+			std::cerr << "CrystalFp library and driver: " << "2011-07-03 06:59:30 +0200" << std::endl;
+			throw CmdLineSuccess();
+			return;
+
 		case OPT_VERBOSE:
 			if(args.OptionArg())
 			{

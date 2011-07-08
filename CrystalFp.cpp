@@ -1140,3 +1140,9 @@ void CrystalFp::unserialize(std::ifstream& aStream, bool aAppend, int aStepOffse
 }
 
 
+void CrystalFp::dump(void) const
+{
+	std::cerr << "Num. structures: " << mPimpl->mSL.getSelectedCount() << std::endl;
+}
+
+

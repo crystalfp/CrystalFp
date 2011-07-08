@@ -728,10 +728,16 @@ int main(int ac, char **av)
 		}
 		else
 		{
-			cfp.unserialize(unserialized);
+			xcfp.unserialize(unserialized);
 			unserialized.close();
 		}
 		if(cmd.mVerboseLevel >= 1) std::cerr << "End deserializing content" << std::endl;
+
+		std::cerr << std::endl << "**** Original" << std::endl;
+		cfp.dump();
+
+		std::cerr << std::endl << "**** Reloaded" << std::endl;
+		xcfp.dump();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////

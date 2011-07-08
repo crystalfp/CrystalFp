@@ -512,6 +512,14 @@ public:
 
 	//@}
 
+	//###################################################################################
+	/// @name Debugging support
+	///  Class debugging support
+	//@{
+
+	void dump(void) const;
+	//@}
+
 private:
 	CrystalFp(const CrystalFp&);
 	CrystalFp& operator=(const CrystalFp&);
