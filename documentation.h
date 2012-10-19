@@ -213,6 +213,7 @@
 
 
 /// @page ex_page Usage example
+/// A standard example of CrystalFp invocation.
 ///
 /// @code
 /// cfp \
@@ -250,6 +251,7 @@
 
 
 /// @page fmt_page Output file formats
+/// Definition of the drive program output file formats.
 ///
 /// @section fmt_fp_sect Binary output for fingerprints
 ///
@@ -291,6 +293,7 @@
 
 
 /// @page bld_page Build
+/// Build procedure for CrystalFp.
 ///
 /// The library uses CMAKE as its build system.
 /// There is a switch that can be set during configuration to enable OpenMP usage to speedup fingerprint and distances computation.
@@ -303,10 +306,11 @@
 
 
 /// @page future_page Future and to do
+/// Missing thinkg that should be added in CrystalFp.
 ///
-/// Create the serialize/unserialize mechanism for CrystalFp class.
+/// # Create the serialize/unserialize mechanism for CrystalFp class.
 ///
-/// Enable reading of VASP poscar + elements
+/// # Enable reading of VASP poscar + elements
 /// 
-/// Put more formats readers
+/// # Add more formats readers
 ///

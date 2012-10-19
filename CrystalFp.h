@@ -519,6 +519,8 @@ public:
 	///  Class debugging support
 	//@{
 
+	/// Dump the CrystalFp internal structures to help library debugging.
+	///
 	void dump(void) const;
 	//@}
 
