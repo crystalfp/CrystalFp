@@ -33,7 +33,7 @@
 /// 
 /// @section res_sec Resources
 ///
-/// Up to date information on the CrystalFp library can be found on the <a href="http://www.cscs.ch/~mvalle/CrystalFp/">project pages</a>.
+/// Up to date information on the CrystalFp library can be found on the <a href="http://mariovalle.name/CrystalFp/">project pages</a>.
 ///
 /// Here, the fingerprinting method section collects general information about the project, its philosophy and related publications.
 /// The library contains the source code and API documentation of the CrystalFp library.
