@@ -157,13 +157,13 @@ const std::vector<std::string> CrystalFp::getGroupingMethodsNames(void) const
 }
 
 
-unsigned int CrystalFp::getNumActiveStructures(void) const
+size_t CrystalFp::getNumActiveStructures(void) const
 {
 	return mPimpl->mSL.getSelectedCount();
 }
 
 
-unsigned int CrystalFp::getNumTotalStructures(void) const
+size_t CrystalFp::getNumTotalStructures(void) const
 {
 	return mPimpl->mSL.getTotalCount();
 }
@@ -183,7 +183,7 @@ bool CrystalFp::hasUnitCell(void) const
 }
 
 
-int CrystalFp::idxToStep(unsigned int aIdx) const
+int CrystalFp::idxToStep(size_t aIdx) const
 {
 	Structure& s = mPimpl->mSL.getStructureByIndex(aIdx);
 
@@ -571,7 +571,7 @@ void CrystalFp::computeFingerprints(void)
 			std::ofstream outfile(filename.c_str(), std::ios_base::binary | std::ios_base::trunc | std::ios_base::out);
 			if(!outfile.good())
 			{
-				std::cerr << "Cannot create fingerprints checkpoint file <" << filename << "> Ignoring step: " << (*it)->first << std::endl;
+				std::cerr << "Cannot create fingerprints checkpoint file <" << filename << "> Ignoring step: " << (*it)->first << " for checkpointing" << std::endl;
 			}
 			else
 			{
@@ -623,7 +623,7 @@ float CrystalFp::getCutoffDistance(void) const
 }
 
 
-const float* CrystalFp::getFingerprint(unsigned int aStructureIdx) const
+const float* CrystalFp::getFingerprint(size_t aStructureIdx) const
 {
 	return &(mPimpl->mSL.getStructureByIndex(aStructureIdx).mFingerprint[0]);
 }
@@ -665,7 +665,7 @@ void CrystalFp::computeDistanceMatrix(void)
 	if(!hasFingerprints()) throw CrystalFpFatal("Cannot compute distances, missing fingerprints");
 
 	// Create temporary distances triangular matrix
-	unsigned int ns = mPimpl->mSL.size();
+	unsigned int ns = static_cast<unsigned int>(mPimpl->mSL.getSelectedCount());
 	unsigned int num_elem = (ns*ns-ns)/2;
 	std::vector<float> dist_matrix;
 	dist_matrix.resize(num_elem);
@@ -683,9 +683,8 @@ void CrystalFp::computeDistanceMatrix(void)
 	}
 
 	// Compute distances
-	int ii;
-	#pragma omp parallel for private(ii) default(none) shared(num_elem, row_col_table, method, dist_matrix)
-	for(ii=0; ii < (int)num_elem; ++ii)
+	#pragma omp parallel for default(none) shared(num_elem, row_col_table, method, dist_matrix)
+	for(int ii=0; ii < (int)num_elem; ++ii)
 	{
 		unsigned int row = row_col_table[2*ii+0];
 		unsigned int col = row_col_table[2*ii+1];
@@ -699,11 +698,11 @@ void CrystalFp::computeDistanceMatrix(void)
 	}
 
 	// Create output matrix
-	mPimpl->mDistanceMatrix.setVector(dist_matrix, mPimpl->mSL.size());
+	mPimpl->mDistanceMatrix.setVector(dist_matrix, mPimpl->mSL.getSelectedCount());
 }
 
 
-float CrystalFp::getDistance(unsigned int aIdx1, unsigned int aIdx2) const
+float CrystalFp::getDistance(size_t aIdx1, size_t aIdx2) const
 {
 	return mPimpl->mDistanceMatrix(aIdx1, aIdx2);
 }
@@ -747,7 +746,7 @@ void CrystalFp::groupResults(void)
 
 	// Invoke the grouping method
 	mPimpl->mGroupedResults.clear();
-	method->doGrouping(mPimpl->mSL.size(), mPimpl->mDistanceMatrix, mPimpl->mGroupedResults);
+	method->doGrouping(mPimpl->mSL.getSelectedCount(), mPimpl->mDistanceMatrix, mPimpl->mGroupedResults);
 
 	// Count single and multi entries
 	mPimpl->mNumSingleEntries  = 0;
@@ -808,49 +807,49 @@ bool CrystalFp::groupingNeedsK(void) const
 }
 
 
-float CrystalFp::getTotalEnergy(unsigned int aIdx) const
+float CrystalFp::getTotalEnergy(size_t aIdx) const
 {
 	Structure& s = mPimpl->mSL.getStructureByIndex(aIdx);
 	return s.mEnergyPerAtom*s.mNumAtoms;
 }
 
 
-float CrystalFp::getPerAtomEnergy(unsigned int aIdx) const
+float CrystalFp::getPerAtomEnergy(size_t aIdx) const
 {
 	Structure& s = mPimpl->mSL.getStructureByIndex(aIdx);
 	return s.mEnergyPerAtom;
 }
 
 
-const float* CrystalFp::getUnitCell(unsigned int aIdx) const
+const float* CrystalFp::getUnitCell(size_t aIdx) const
 {
 	Structure& s = mPimpl->mSL.getStructureByIndex(aIdx);
 	return s.mUnitCell;
 }
 
 
-const float* CrystalFp::getWeights(unsigned int aIdx) const
+const float* CrystalFp::getWeights(size_t aIdx) const
 {
 	Structure& s = mPimpl->mSL.getStructureByIndex(aIdx);
 	return &s.mWeights[0];
 }
 
 
-unsigned int CrystalFp::getNatoms(unsigned int aIdx) const
+unsigned int CrystalFp::getNatoms(size_t aIdx) const
 {
 	Structure& s = mPimpl->mSL.getStructureByIndex(aIdx);
 	return s.mNumAtoms;
 }
 
 
-const unsigned int* CrystalFp::getAtomZ(unsigned int aIdx) const
+const unsigned int* CrystalFp::getAtomZ(size_t aIdx) const
 {
 	Structure& s = mPimpl->mSL.getStructureByIndex(aIdx);
 	return &s.mAtomZ[0];
 }
 
 
-const float* CrystalFp::getCoords(unsigned int aIdx) const
+const float* CrystalFp::getCoords(size_t aIdx) const
 {
 	Structure& s = mPimpl->mSL.getStructureByIndex(aIdx);
 	return &s.mCoordinates[0];
@@ -978,9 +977,9 @@ unsigned int CrystalFp::reduceDuplicatesToRepresentative(std::vector<unsigned in
 	}
 
 	// Mark as deselected the structures
-	unsigned int ns = getNumActiveStructures();
+	unsigned int ns = static_cast<unsigned int>(getNumActiveStructures());
 	mPimpl->mSL.selectAllIncluded(included);
-	unsigned int rns = getNumActiveStructures();
+	unsigned int rns = static_cast<unsigned int>(getNumActiveStructures());
 
 	// Recompute the distances
 	mPimpl->mDistanceMatrix.resizeToIncluded(included);
@@ -1041,7 +1040,7 @@ void CrystalFp::serialize(std::ofstream& aStream) const
 	aStream.write((char *)&mPimpl->mDiffrBinSize, sizeof(float));
 	aStream.write((char *)&mPimpl->mDiffrPeakSize, sizeof(float));
 	aStream.write((char *)&mPimpl->mForcedFpLen, sizeof(unsigned int));
-	x = mPimpl->mCheckpointDir.size();
+	x = static_cast<unsigned int>(mPimpl->mCheckpointDir.size());
 	aStream.write((char *)&x, sizeof(unsigned int));
 	if(x) aStream.write(mPimpl->mCheckpointDir.c_str(), x);
 	aStream.write((char *)&mPimpl->mFingerprintMethodIdx, sizeof(unsigned int));
@@ -1052,11 +1051,11 @@ void CrystalFp::serialize(std::ofstream& aStream) const
 	aStream.write((char *)&mPimpl->mNumGroupedEntries, sizeof(unsigned int));
 	aStream.write((char *)&mPimpl->mNumSingleEntries, sizeof(unsigned int));
 	mPimpl->mDistanceMatrix.serialize(aStream);
-	x = mPimpl->mGroupedResults.size();
+	x = static_cast<unsigned int>(mPimpl->mGroupedResults.size());
 	aStream.write((char *)&x, sizeof(unsigned int));
 	for(unsigned int i=0; i < x; ++i)
 	{
-		unsigned int y = mPimpl->mGroupedResults.size();
+		unsigned int y = static_cast<unsigned int>(mPimpl->mGroupedResults.size());
 		aStream.write((char *)&y, sizeof(unsigned int));
 		std::set<unsigned int>::const_iterator is;
 		for(is=mPimpl->mGroupedResults[i].begin(); is != mPimpl->mGroupedResults[i].end(); ++is)

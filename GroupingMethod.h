@@ -25,7 +25,7 @@ public:
 	virtual ~GroupingMethod() {}
 	void setKvalue(unsigned int aK) { mK = aK;}
 	void setMaxDistanceForGrouping(float aMaxDistanceForGrouping) { mMaxDistanceForGrouping = aMaxDistanceForGrouping;}
-	virtual void doGrouping(unsigned int aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult) =0;
+	virtual void doGrouping(size_t aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult) =0;
 	virtual bool needsK(void) const {return false;}
 
 protected:
@@ -40,9 +40,9 @@ class PseudoSNNGrouping : public GroupingMethod
 {
 public:
 	PseudoSNNGrouping() {mName = "Pseudo SNN";}
-	virtual void doGrouping(unsigned int aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult);
-	void computeConnectionMatrix(unsigned int aNumStructures, const DistanceMatrix& aDistances, unsigned int* aConnection) const;
-	void doDepthFirstVisit(unsigned int aIdx, bool *aAssigned, std::set<unsigned int>& aGroups, unsigned int* aConnection, unsigned int aNumStructures) const;
+	virtual void doGrouping(size_t aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult);
+	void computeConnectionMatrix(size_t aNumStructures, const DistanceMatrix& aDistances, unsigned int* aConnection) const;
+	void doDepthFirstVisit(unsigned int aIdx, bool *aAssigned, std::set<unsigned int>& aGroups, unsigned int* aConnection, size_t aNumStructures) const;
 	virtual bool needsK(void) const {return true;}
 };
 
@@ -51,7 +51,7 @@ public:
 class HierarchicalGrouping : public GroupingMethod
 {
 public:
-	virtual void doGrouping(unsigned int aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult);
+	virtual void doGrouping(size_t aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult);
 
 protected:
 	struct Node
@@ -66,7 +66,7 @@ protected:
 			std::vector<unsigned int>::const_iterator ii;
 			for(ii=n.idx.begin(); ii != n.idx.end(); ++ii) idx.push_back(*ii);
 		}
-		void Merge(const std::list<Node>::iterator n)
+		void Merge(const std::list<Node>::iterator& n)
 		{
 			std::vector<unsigned int>::const_iterator ii;
 			for(ii=n->idx.begin(); ii != n->idx.end(); ++ii) idx.push_back(*ii);

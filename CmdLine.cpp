@@ -30,7 +30,7 @@ const char *CmdLine::getLastErrorText(CSimpleOpt& aOptParser)
 
 void CmdLine::showHelp(const CSimpleOpt::SOption *aParserOptions)
 {
-	int i, j, cnt;
+	size_t i, j, cnt;
 
 	// Count entries and create an indicator array
 	for(cnt=0; aParserOptions[cnt].pszArg != NULL; ++cnt) {}
@@ -317,7 +317,6 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 			// Get the last commit date from Git using: git log -n -pretty=format:"%ci"
 			std::cerr << "CrystalFp library and driver: " << "2011-07-03 06:59:30 +0200" << std::endl;
 			throw CmdLineSuccess();
-			return;
 
 		case OPT_VERBOSE:
 			if(args.OptionArg())
@@ -334,7 +333,6 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 			std::cerr << "    " << aVal[0] << usage_msg << std::endl << std::endl;
 			showHelp(parser_options);
 			throw CmdLineSuccess();
-			return;
 
 		case OPT_TYPES:
 			convertAtomSymbolsToZ(args.OptionArg(), mAtomZ);
@@ -476,7 +474,6 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 				std::cerr << "idx       " << "Structure index" << std::endl;
 
 				throw CmdLineSuccess();
-				return;
 			}
 			mAnalysisParams.insert(std::pair<std::string,std::string>(arg_param[0], arg_param[1]));
 			break;
@@ -511,7 +508,6 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 				std::cerr << "timestep    " << "Timestep for the iterations" << std::endl;
 
 				throw CmdLineSuccess();
-				return;
 			}
 			mScatterplotParams.insert(std::pair<std::string,std::string>(arg_param[0], arg_param[1]));
 			break;
@@ -538,7 +534,6 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 		std::cerr << "    " << aVal[0] << usage_msg << std::endl << std::endl;
 		showHelp(parser_options);
 		throw CmdLineFatal();
-		return;
 
 	case 1:
 		mPoscarFile = args.File(0);

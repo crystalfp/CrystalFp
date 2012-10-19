@@ -32,7 +32,7 @@ public:
 		for(im=mMethodsList.begin(); im != mMethodsList.end(); ++im) delete (*im);
 		mMethodsList.clear();
 	}
-	unsigned int size(void) { return mMethodsList.size(); }
+	size_t size(void) { return mMethodsList.size(); }
 
 
 protected:

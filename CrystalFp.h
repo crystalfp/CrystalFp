@@ -116,13 +116,13 @@ public:
 	///
 	/// @return The number of active structures
 	///
-	unsigned int	getNumActiveStructures(void) const;
+	size_t			getNumActiveStructures(void) const;
 
 	/// Return the total number of structures loaded.
 	///
 	/// @return The number of loaded structures (active and ignored)
 	///
-	unsigned int	getNumTotalStructures(void) const;
+	size_t			getNumTotalStructures(void) const;
 
 	//@}
 
@@ -181,48 +181,48 @@ public:
 	/// @param aIdx Index of the structure
 	/// @return The step number
 	///
-	int				idxToStep(unsigned int aIdx) const;
+	int				idxToStep(size_t aIdx) const;
 
 	/// Get the total energy value for the selected structure.
 	///
 	/// @param aIdx Index of the structure
 	/// @return The energy value
 	///
-	float			getTotalEnergy(unsigned int aIdx) const;
+	float			getTotalEnergy(size_t aIdx) const;
 
 	/// Get the energy per atom value for the selected structure.
 	///
 	/// @param aIdx Index of the structure
 	/// @return The energy value
 	///
-	float			getPerAtomEnergy(unsigned int aIdx) const;
+	float			getPerAtomEnergy(size_t aIdx) const;
 	
 	/// Get the number of atoms for the selected structure.
 	///
 	/// @param aIdx Index of the structure
 	/// @return The number of atoms
 	///
-	unsigned int	getNatoms(unsigned int aIdx) const;
+	unsigned int	getNatoms(size_t aIdx) const;
 
 	/// Get the unit cell for the selected structure.
 	///
 	/// @param aIdx Index of the structure
 	/// @return The unit cell
 	///
-	const float*	getUnitCell(unsigned int aIdx) const;
+	const float*	getUnitCell(size_t aIdx) const;
 	
 	/// Get the kind of atoms for the selected structure
 	/// @param aIdx Index of the structure
 	/// @return The array of atom's types
 	///
-	const unsigned int* getAtomZ(unsigned int aIdx) const;
+	const unsigned int* getAtomZ(size_t aIdx) const;
 
 	/// Get the coordinates for the selected structure.
 	///
 	/// @param aIdx Index of the structure
 	/// @return The coordinates array
 	///
-	const float*	getCoords(unsigned int aIdx) const;
+	const float*	getCoords(size_t aIdx) const;
 
 	//@}
 
@@ -330,7 +330,7 @@ public:
 	/// @param aStructureIdx  Index of the structure
 	/// @return The fingerprint (length is num_sections * section_length)
 	///
-	const float*	getFingerprint(unsigned int aStructureIdx) const;
+	const float*	getFingerprint(size_t aStructureIdx) const;
 
 	/// Get the gaussian peak smoothing width.
 	///
@@ -356,7 +356,7 @@ public:
 	/// @param aIdx Index of the structure
 	/// @return The weights (one for each fingerprint part)
 	///
-	const float*	getWeights(unsigned int aIdx) const;
+	const float*	getWeights(size_t aIdx) const;
 
 	//@}
 
@@ -400,7 +400,7 @@ public:
 	///
 	/// @exception CrystalFpFatal On invalid indices.
 	///
-	float 			getDistance(unsigned int aIdx1, unsigned int aIdx2) const;
+	float 			getDistance(size_t aIdx1, size_t aIdx2) const;
 
 	/// Get the maximum distance between two fingerprints.
 	///
@@ -505,6 +505,8 @@ public:
 	/// Unserialize the class from the given binary stream
 	///
 	/// @param[in] aStream The stream from which the class should be deserialized
+	/// @param[in] aAppend Append the read structures to the list of already read structures
+	/// @param[in] aStepOffset Apply this offset to the id of the appended structures
 	///
 	/// @exception CrystalFpFatal On read error and on format validation error.
 	///

@@ -210,11 +210,13 @@ void NormalizedDiffractionHistogram::computeFingerprint(Structure& aStructure, c
 
 void PerElementRdfHistogram::computeFingerprint(Structure& aStructure, const unsigned int* aExpansion)
 {
+	std::cerr << "Start" << std::endl;
 	// Compute fingerprint sizes
 	const unsigned int MAX_Z = 111;
 	int num_atoms[MAX_Z+1];
 	unsigned int i, j;
-	for(i=1; i <= MAX_Z; ++i) num_atoms[i] = 0;
+	//for(i=1; i <= MAX_Z; ++i) num_atoms[i] = 0;
+	memset(num_atoms, 0, (MAX_Z+1)*sizeof(int));
 	std::vector<unsigned int>::const_iterator iz;
 	for(iz=aStructure.mAtomZ.begin(); iz != aStructure.mAtomZ.end(); ++iz) ++num_atoms[*iz];
 	unsigned int num_species = 0;
@@ -225,7 +227,7 @@ void PerElementRdfHistogram::computeFingerprint(Structure& aStructure, const uns
 
 	unsigned int num_sections = (num_species*(num_species+1))/2;
 	unsigned int nbins = (unsigned int)((mCutoff/mBinSize)+0.5F);
-	unsigned int fp_len = nbins*num_sections;
+	size_t fp_len = nbins*num_sections;
 	float delta = mCutoff/nbins;
     
 	float* unit_cell = 0;
@@ -246,7 +248,7 @@ void PerElementRdfHistogram::computeFingerprint(Structure& aStructure, const uns
 	int ii;
 	int di, dj, dk;
 	int iorig;
-	unsigned int imax = (2*aExpansion[0]+1)*(2*aExpansion[1]+1)*(2*aExpansion[2]+1)*3;
+	size_t imax = (2*aExpansion[0]+1)*(2*aExpansion[1]+1)*(2*aExpansion[2]+1)*3;
 	int *d = new int[imax];
 	for(di= -ex; di <= ex; ++di)
 	{
@@ -280,10 +282,12 @@ void PerElementRdfHistogram::computeFingerprint(Structure& aStructure, const uns
 #else
 	int nt = 1;
 #endif
+		std::cerr << "Start2" << std::endl;
 
 	// Every thread update a line of this temporary array
 	float *fpp = new float[fp_len*nt];
 	memset(fpp, 0, fp_len*nt*sizeof(float));
+		std::cerr << "Start3" << std::endl;
 
 	#pragma omp parallel for private(ii) default(none) shared(iorig, natoms, imax, atom_z, fpp, d, coords, num_atoms, cell_volume, num_species, unit_cell, delta, nbins, fp_len, atoms_idx, dp)
 	for(ii=0; ii < (int)imax; ii += 3)
@@ -374,6 +378,7 @@ void PerElementRdfHistogram::computeFingerprint(Structure& aStructure, const uns
 			}
 		}
 	}
+		std::cerr << "Start4" << std::endl;
 
 	// Normalize and accumulate the per-thread fingerprints
 	aStructure.mFingerprintNumSections = num_sections;
@@ -419,4 +424,5 @@ void PerElementRdfHistogram::computeFingerprint(Structure& aStructure, const uns
 			aStructure.mInteratomicDistances[idp->first].push_back(idp->second);
 		}
 	}
+		std::cerr << "End" << std::endl;
 }

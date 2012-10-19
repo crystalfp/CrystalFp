@@ -31,7 +31,7 @@ struct CrystalFpScatterplot::CrystalFpScatterplotImpl
 	float				mPerturbScale;
 	float				mPerturbDecay;
 
-	unsigned int		mNumPoints;
+	size_t				mNumPoints;
 
 	std::vector<float>	mPositions;			///< Array of particle positions
 	std::vector<float>	mForces;			///< Forces on the particles
@@ -42,7 +42,7 @@ struct CrystalFpScatterplot::CrystalFpScatterplotImpl
 	float				mMaxStress;			///< Stress value for the saved position
 
 	DiagnosticType		mDiagnostic;		///< The requested scatterplot diagnostic type
-	unsigned int		mNumBins;			///< Number of bins for binned diagnostic
+	size_t				mNumBins;			///< Number of bins for binned diagnostic
 	float				mWobbleScale;		///< A small random perturbation to the binned result points to avoid visual artefacts.
 };
 
@@ -111,7 +111,7 @@ void CrystalFpScatterplot::setNamedParam(const std::string& aName, const std::st
 	}
 }
 
-unsigned int CrystalFpScatterplot::initScatterplot(const CrystalFp *aCfp)
+size_t CrystalFpScatterplot::initScatterplot(const CrystalFp *aCfp)
 {
 	mCrystalFp = aCfp;
 
@@ -122,12 +122,12 @@ unsigned int CrystalFpScatterplot::initScatterplot(const CrystalFp *aCfp)
 	srand((unsigned)time(NULL));
 
 	// Initialize the arrays
-	unsigned int ns = mCrystalFp->getNumActiveStructures();
+	size_t ns = mCrystalFp->getNumActiveStructures();
 	mPimpl->mNumPoints = ns;
 	mPimpl->mForces.resize(2*ns);
 
 	// Initialize random positions
-	unsigned int i;
+	size_t i;
 	mPimpl->mPositions.resize(2*ns);
 	for(i=0; i < 2*ns; ++i) mPimpl->mPositions[i] = 2.0F*((float)rand()/(float)RAND_MAX - 0.5F);
 
@@ -152,7 +152,7 @@ void CrystalFpScatterplot::getPoints(float* aCoords) const
 }
 
 
-void CrystalFpScatterplot::colorByGroup(unsigned int aNumPoints, float *aResult) const
+void CrystalFpScatterplot::colorByGroup(size_t aNumPoints, float *aResult) const
 {
 	int group;
 	const std::vector< std::set<unsigned int> > all_groups = mCrystalFp->getGroups();
@@ -183,7 +183,7 @@ void CrystalFpScatterplot::getValues(float* aValues, ValueType aValueType) const
 	if(!mPimpl->mNumPoints) return;
 
 	// Set the point values
-	unsigned int i;
+	size_t i;
 	switch(aValueType)
 	{
 	case VAL_TOTAL_ENERGY:
@@ -203,7 +203,7 @@ void CrystalFpScatterplot::getValues(float* aValues, ValueType aValueType) const
 		break;
 
 	case VAL_STEP:
-		for(i=0; i < mPimpl->mNumPoints; ++i) aValues[i] = (float)i;
+		for(i=0; i < mPimpl->mNumPoints; ++i) aValues[i] = static_cast<float>(i);
 		break;
 
 	default:
@@ -214,7 +214,7 @@ void CrystalFpScatterplot::getValues(float* aValues, ValueType aValueType) const
 
 float CrystalFpScatterplot::stepScatterplot(float aTimestep)
 {
-	unsigned int ns = mPimpl->mNumPoints;
+	size_t ns = mPimpl->mNumPoints;
 	if(!ns) return 0.0F;
 
 	// Initialize forces and stress
@@ -222,7 +222,7 @@ float CrystalFpScatterplot::stepScatterplot(float aTimestep)
 	mPimpl->mStress.assign(ns, 0.0F);
 
 	// Compute forces
-	unsigned int i, j;
+	size_t i, j;
 	for(i=0; i < ns-1; ++i)
 	{
 		for(j=i+1; j < ns; ++j)
@@ -310,8 +310,8 @@ void CrystalFpScatterplot::perturbPositions(void)
 	}
 
 	// Randomly move the points
-	unsigned int ns = mPimpl->mNumPoints;
-	for(unsigned int i=0; i < ns; ++i)
+	size_t ns = mPimpl->mNumPoints;
+	for(size_t i=0; i < ns; ++i)
 	{
 		float dx = 2.0F*((float)rand()/(float)RAND_MAX - 0.5F);
 		float dy = 2.0F*((float)rand()/(float)RAND_MAX - 0.5F);
@@ -332,14 +332,14 @@ float CrystalFpScatterplot::computeCost(void) const
 	std::vector<float> tmp = mPimpl->mStress;
 
 	std::sort(tmp.begin(), tmp.end());
-	unsigned int npoints = tmp.size();
+	size_t npoints = tmp.size();
 	float median = (npoints % 2) ? tmp[npoints/2] : (tmp[npoints/2]+tmp[npoints/2-1])/2.0F;
 
 	return median;
 }
 
 
-unsigned int CrystalFpScatterplot::initDiagnostic(DiagnosticType aDiagnostic)
+size_t CrystalFpScatterplot::initDiagnostic(DiagnosticType aDiagnostic)
 {
 	mPimpl->mDiagnostic = aDiagnostic;
 
@@ -383,10 +383,10 @@ void CrystalFpScatterplot::getDiagnosticValues(float* aCoords, float* aValues) c
 	// Ignore 
 	if(mPimpl->mDiagnostic == DIAG_DO_NOTHING) return;
 
-	unsigned int i, j, k;
+	size_t i, j, k;
 	float max_real_dist = mCrystalFp->getMaxDistance();
-	unsigned int ns = mPimpl->mNumPoints;
-	unsigned int nb = mPimpl->mNumBins;
+	size_t ns = mPimpl->mNumPoints;
+	size_t nb = mPimpl->mNumBins;
 	std::vector<Point> pt;
 	std::vector<Point>::const_iterator ipt;
 
@@ -463,11 +463,11 @@ void CrystalFpScatterplot::getDiagnosticValues(float* aCoords, float* aValues) c
 				float real_dist_norm = mCrystalFp->getDistance(i, j)/max_real_dist;
 
 				// Bin along x
-				unsigned int bx = (unsigned int)(real_dist_norm * nb + 0.5F);
+				size_t bx = static_cast<size_t>(real_dist_norm * nb + 0.5F);
 				if(bx >= nb) bx = nb - 1;
 
 				// Bin along y
-				unsigned int by = (unsigned int)(proj_dist_norm * nb + 0.5F);
+				size_t by = static_cast<size_t>(proj_dist_norm * nb + 0.5F);
 				if(by >= nb) by = nb - 1;
 
 				// Output

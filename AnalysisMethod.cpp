@@ -77,10 +77,10 @@ void MethodGetDeltaEnergy::getValues(const cfp::CrystalFp* aCfp, float* aValue, 
 
 void MethodGetDistances::getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int /*aIdx*/) const
 {
-	unsigned int idx = 0;
-	for(unsigned int i1=0; i1 < aCfp->getNumActiveStructures()-1; ++i1)
+	size_t idx = 0;
+	for(size_t i1=0; i1 < aCfp->getNumActiveStructures()-1; ++i1)
 	{
-		for(unsigned int i2=i1+1; i2 < aCfp->getNumActiveStructures(); ++i2)
+		for(size_t i2=i1+1; i2 < aCfp->getNumActiveStructures(); ++i2)
 		{
 			aValue[idx++] = aCfp->getDistance(i1, i2);
 		}
@@ -106,9 +106,9 @@ void MethodGetEnergyFromMin::getValues(const cfp::CrystalFp* aCfp, float* aValue
 
 void MethodGetDistFromMin::getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int /*aIdx*/) const
 {
-	unsigned int idx;
+	size_t idx;
 	float min_energy = FLT_MAX;
-	unsigned int min_idx;
+	size_t min_idx;
 	for(idx=0; idx < aCfp->getNumActiveStructures(); ++idx)
 	{
 		float e = aCfp->getPerAtomEnergy(idx);
@@ -122,13 +122,14 @@ void MethodGetDistFromMin::getValues(const cfp::CrystalFp* aCfp, float* aValue, 
 
 void MethodGetPointDepth::getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int /*aIdx*/) const
 {
-	std::vector<float> v;
-	unsigned int i, j, k;
+	//std::vector<float> v;
+	unsigned int k;
+	size_t i, j;
 
 	unsigned int len = aCfp->getFingerprintNumSections() * aCfp->getFingerprintSectionLen();
 	float *vect = new float[len];
 	float *e = new float[len];
-	unsigned int ns = aCfp->getNumActiveStructures();
+	size_t ns = aCfp->getNumActiveStructures();
 #ifdef SPHERICAL_DEPTH
 	for(i=0; i < ns; ++i)
 	{
@@ -204,7 +205,7 @@ void MethodGetPointDepth::getValues(const cfp::CrystalFp* aCfp, float* aValue, u
 
 void MethodGetOrderF2::getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int /*aIdx*/) const
 {
-	unsigned int i, j, k;
+	unsigned int i, j;
 
 	unsigned int ns = aCfp->getFingerprintNumSections();
 	if(ns == 1)
@@ -254,7 +255,7 @@ void MethodGetOrderF2::getValues(const cfp::CrystalFp* aCfp, float* aValue, unsi
 
 				// Compute the degree of order
 				float op = 0.0F;
-				for(k=0; k < fplen; ++k) op += yv[k]*yv[k];
+				for(unsigned int k=0; k < fplen; ++k) op += yv[k]*yv[k];
 				degree_of_order += aCfp->getDiffrBinSize()*op/R0*Wij[j];
 			}
 			aValue[i] = degree_of_order;
@@ -264,7 +265,7 @@ void MethodGetOrderF2::getValues(const cfp::CrystalFp* aCfp, float* aValue, unsi
 
 void MethodGetOrderF2R2::getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int /*aIdx*/) const
 {
-	unsigned int i, j, k;
+	unsigned int i, j;
 
 	unsigned int ns = aCfp->getFingerprintNumSections();
 	if(ns == 1)
@@ -315,7 +316,7 @@ void MethodGetOrderF2R2::getValues(const cfp::CrystalFp* aCfp, float* aValue, un
 
 				// Compute the degree of order
 				float op = 0.0F;
-				for(k=0; k < fplen; ++k) op += yv[k]*yv[k]*(k*aCfp->getDiffrBinSize())*(k*aCfp->getDiffrBinSize());
+				for(unsigned int k=0; k < fplen; ++k) op += yv[k]*yv[k]*(k*aCfp->getDiffrBinSize())*(k*aCfp->getDiffrBinSize());
 				degree_of_order += aCfp->getDiffrBinSize()*op*Wij[j];
 			}
 
@@ -424,7 +425,7 @@ float MethodGetQuasiEntropy::computeQuasiEntropy(const cfp::CrystalFp* aCfp, uns
 		}
 
 		// Sum over A (only if collective diversity can be computed)
-		if(ncoll_div) quasi_entropy += -Na/(float)natoms*(float)(coll_div/ncoll_div);
+		if(ncoll_div != 0.) quasi_entropy += -Na/(float)natoms*(float)(coll_div/ncoll_div);
 	}
 
 	delete [] fp;

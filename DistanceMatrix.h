@@ -10,9 +10,8 @@
 class DistanceMatrix
 {
 public:
-	DistanceMatrix(unsigned int aNumElements=0)
+	DistanceMatrix(size_t aNumElements=0) : mNumElements(aNumElements), mDummy(0.0F)
 	{
-		mNumElements = aNumElements;
 		if(aNumElements == 0) return;
 		mDistances.reserve((aNumElements*aNumElements-aNumElements)/2);
 		mDistances.resize((aNumElements*aNumElements-aNumElements)/2);
@@ -24,7 +23,7 @@ public:
 	}
 	
 	// Copy constructor and assignment
-	DistanceMatrix(const DistanceMatrix& aDistMat)
+	DistanceMatrix(const DistanceMatrix& aDistMat) : mDummy(0.0F)
 	{
 		mNumElements = aDistMat.size();
 		if(mNumElements == 0) return;
@@ -43,20 +42,21 @@ public:
 				mDistances.reserve((mNumElements*mNumElements-mNumElements)/2);
 				mDistances = aDistMat.getVector();
 			}
+			mDummy = 0.0F;
 		}
 		
 		// Return ref for multiple assignment
 		return *this;
 	}
 
-	void setVector(const std::vector<float>& aDistVect, unsigned int aNumElements)
+	void setVector(const std::vector<float>& aDistVect, size_t aNumElements)
 	{
 		mNumElements = aNumElements;
 		if(mNumElements == 0) return;
 		mDistances = aDistVect;
 	}
 	
-	void resize(unsigned int aNumElements)
+	void resize(size_t aNumElements)
 	{
 		mNumElements = aNumElements;
 		if(aNumElements == 0) return;
@@ -69,7 +69,7 @@ public:
 		return mDistances;
 	}
 
-	unsigned int size(void) const
+	size_t size(void) const
 	{
 		return mNumElements;
 	}
@@ -89,14 +89,14 @@ public:
 		return *std::max_element(mDistances.begin(), mDistances.end());
 	}
 
-	float& operator() (unsigned int aRow, unsigned int aCol)
+	float& operator() (size_t aRow, size_t aCol)
 	{
 		if(aRow >= mNumElements) throw cfp::CrystalFpFatal("Invalid aRow in DistanceMatrix");
 		if(aCol >= mNumElements) throw cfp::CrystalFpFatal("Invalid aCol in DistanceMatrix");
 
 		if(aRow == aCol) {mDummy = 0.0F; return mDummy;}
 
-		unsigned int idx;
+		size_t idx;
 		if(aRow < aCol)
 		{
 			idx = aRow*(2*mNumElements-aRow-1)/2 + aCol - aRow - 1;
@@ -109,14 +109,14 @@ public:
 		return mDistances[idx];
 	}
 
-	float operator() (unsigned int aRow, unsigned int aCol) const
+	float operator() (size_t aRow, size_t aCol) const
 	{
 		if(aRow >= mNumElements) throw cfp::CrystalFpFatal("Invalid aRow in DistanceMatrix");
 		if(aCol >= mNumElements) throw cfp::CrystalFpFatal("Invalid aCol in DistanceMatrix");
 
 		if(aRow == aCol) return 0.0F;
 
-		unsigned int idx;
+		size_t idx;
 		if(aRow < aCol)
 		{
 			idx = aRow*(2*mNumElements-aRow-1)/2 + aCol - aRow - 1;
@@ -131,10 +131,11 @@ public:
 
 	void resizeToIncluded(const std::vector<bool>& aIncluded)
 	{
-		unsigned int i, j;
+		size_t i;
+		unsigned int j;
 
 		// Obtain the new size
-		unsigned int new_size = 0;
+		size_t new_size = 0;
 		for(i=0; i < aIncluded.size(); ++i) if(aIncluded[i]) ++new_size;
 
 		// Check
@@ -151,20 +152,20 @@ public:
 		new_distances.resize((new_size*new_size-new_size)/2);
 
 		// Remove unselected row/columns
-		for(unsigned int row=0; row < mNumElements-1; ++row)
+		for(size_t row=0; row < mNumElements-1; ++row)
 		{
 			if(!aIncluded[row]) continue;
 
-			for(unsigned int col=row+1; col < mNumElements; ++col)
+			for(size_t col=row+1; col < mNumElements; ++col)
 			{
 				if(!aIncluded[col]) continue;
 
-				unsigned int idx = row*(2*mNumElements-row-1)/2 + col - row - 1;
+				size_t idx = row*(2*mNumElements-row-1)/2 + col - row - 1;
 
 				unsigned int nrow = map[row];
 				unsigned int ncol = map[col];
 			
-				unsigned int nidx = nrow*(2*new_size-nrow-1)/2 + ncol - nrow - 1;
+				size_t nidx = nrow*(2*new_size-nrow-1)/2 + ncol - nrow - 1;
 
 				new_distances[nidx] = mDistances[idx];
 			}
@@ -184,10 +185,11 @@ public:
 	
 	void serialize(std::ofstream& aStream) const
 	{
-		unsigned int x = mDistances.size();
+		unsigned int x = static_cast<unsigned int>(mDistances.size());
 		aStream.write((char *)&x, sizeof(unsigned int));
 		if(x) aStream.write((char *)&mDistances[0], sizeof(float)*x);
-		aStream.write((char *)&mNumElements, sizeof(unsigned int));
+		x = static_cast<unsigned int>(mNumElements);
+		aStream.write((char *)&x, sizeof(unsigned int));
 	}
 
 
@@ -195,14 +197,15 @@ public:
 	{
 		unsigned int x;
 		aStream.read((char *)&x, sizeof(unsigned int));
-		mDistances.resize(x);
+		mDistances.resize(static_cast<size_t>(x));
 		if(x) aStream.read((char *)&mDistances[0], sizeof(float)*x);
-		aStream.read((char *)&mNumElements, sizeof(unsigned int));
+		aStream.read((char *)&x, sizeof(unsigned int));
+		mNumElements = x;
 	}
 
 private:
 	std::vector<float>	mDistances;
-	unsigned int		mNumElements;
+	size_t				mNumElements;
 	float				mDummy;
 };
 

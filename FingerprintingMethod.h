@@ -12,15 +12,15 @@ namespace cfp_internal
 class FingerprintingMethod
 {
 public:
-	FingerprintingMethod(const char* aName)
+	FingerprintingMethod(const char* aName) : mName(aName), mCutoff(10.0F), mBinSize(0.05F), mPeakSize(0.02F), mIsNanocluster(false)
 	{
-		mName			= aName;
-		mCutoff			= 10.0F;
-		mBinSize		= 0.05F;
-		mPeakSize		= 0.02F;
-		mIsNanocluster	= false;
+		// mName			= aName;
+		// mCutoff			= 10.0F;
+		// mBinSize		= 0.05F;
+		// mPeakSize		= 0.02F;
+		// mIsNanocluster	= false;
 	};
-	std::string  getName(void) const { return mName; }
+	const std::string&  getName(void) const { return mName; }
 	virtual      ~FingerprintingMethod() {};
 	virtual void computeFingerprint(Structure& aStructure, const unsigned int* aExpansion) =0;
 	void		 setCutoffDistance(float aCutoff) {mCutoff = aCutoff;}

@@ -7,10 +7,10 @@
 #include <iostream>
 #include "ResultsCache.h"
 
-bool ResultsCache::retrieveResult(unsigned int aCategory, unsigned int aMethodIdx, unsigned int aLength, int aId1, int aId2, float* aOut)
+bool ResultsCache::retrieveResult(unsigned int aCategory, unsigned int aMethodIdx, size_t aLength, int aId1, int aId2, float* aOut)
 {
 	// Compute the key
-	sprintf(aKeyTmp, "%u|%u|%u|%d|%d", aCategory, aMethodIdx, aLength, aId1, aId2);
+	sprintf(aKeyTmp, "%u|%u|%u|%d|%d", aCategory, aMethodIdx, static_cast<unsigned int>(aLength), aId1, aId2);
 	aKey = aKeyTmp;
 
 	// If it is in cache, copy the value to the output array
@@ -23,10 +23,10 @@ bool ResultsCache::retrieveResult(unsigned int aCategory, unsigned int aMethodId
 	return false;
 }
 
-void ResultsCache::addResult(unsigned int aCategory, unsigned int aMethodIdx, unsigned int aLength, int aId1, int aId2, const float* aOut)
+void ResultsCache::addResult(unsigned int aCategory, unsigned int aMethodIdx, size_t aLength, int aId1, int aId2, const float* aOut)
 {
 	// Compute the key
-	sprintf(aKeyTmp, "%u|%u|%u|%d|%d", aCategory, aMethodIdx, aLength, aId1, aId2);
+	sprintf(aKeyTmp, "%u|%u|%u|%d|%d", aCategory, aMethodIdx, static_cast<unsigned int>(aLength), aId1, aId2);
 	aKey = aKeyTmp;
 
 	// Cache the value

@@ -37,12 +37,12 @@ public:
 	void selectNone(void);
 	void selectAllIncluded(const std::vector<bool>& aIncluded);
 
-	unsigned int getTotalCount(void) const {return mStructures.size();}
-	unsigned int getSelectedCount(void) const {return mStructuresDirectory.size();}
-	unsigned int size(void) const {return mStructuresDirectory.size();}
+	size_t getTotalCount(void) const {return mStructures.size();}
+	size_t getSelectedCount(void) const {return mStructuresDirectory.size();}
+	//size_t size(void) const {return mStructuresDirectory.size();}
 
 	Structure& getStructureBySequence(int aSequence);
-	Structure& getStructureByIndex(unsigned int aIdx);
+	Structure& getStructureByIndex(size_t aIdx) const;
 
 	void serialize(std::ofstream& aStream) const;
 	void unserialize(std::ifstream& aStream, bool aAppend=false, int aStepOffset=10000);

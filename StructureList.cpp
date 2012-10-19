@@ -70,7 +70,7 @@ Structure& StructureList::getStructureBySequence(int aSequence)
 }
 
 
-Structure& StructureList::getStructureByIndex(unsigned int aIdx)
+Structure& StructureList::getStructureByIndex(size_t aIdx) const
 {
 	if(aIdx >= mStructuresDirectory.size()) throw cfp::CrystalFpFatal("Index out of range");
 	return mStructuresDirectory[aIdx]->second;
@@ -91,7 +91,7 @@ void StructureList::selectAllIncluded(const std::vector<bool>& aIncluded)
 void StructureList::serialize(std::ofstream& aStream) const
 {
 	// Write number of structures
-	unsigned int ns = mStructuresDirectory.size();
+	unsigned int ns = static_cast<unsigned int>(mStructuresDirectory.size());
 	aStream.write((char *)&ns, sizeof(unsigned int));
 
 	// Write the included (or selected) structures

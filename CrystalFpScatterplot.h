@@ -76,7 +76,7 @@ public:
 	///
 	/// @exception CrystalFpFatal If CrystalFp has no distances available.
 	///
-	unsigned int initScatterplot(const CrystalFp *aCfp);
+	size_t initScatterplot(const CrystalFp *aCfp);
 
 	/// Type of value associated to the points.
 	///
@@ -139,7 +139,7 @@ public:
 	///
 	/// @exception CrystalFpFatal If aDiagnostic is invalid.
 	///
-	unsigned int initDiagnostic(DiagnosticType aDiagnostic);
+	size_t initDiagnostic(DiagnosticType aDiagnostic);
 
 	/// Return the diagnostic chart points
 	///
@@ -154,7 +154,7 @@ public:
 	void dumpParams(void) const;
 
 private:
-	void colorByGroup(unsigned int aNumPoints, float *aResult) const;
+	void colorByGroup(size_t aNumPoints, float *aResult) const;
 	float computeCost(void) const;
 
 private:

@@ -19,7 +19,7 @@ public:
 	};
 	std::string getName(void) const { return mName; }
 	virtual ~DistanceMethod() {};
-	virtual float computeDistance(const Structure& aStructure1, const Structure& aStructure2) =0;
+	virtual float computeDistance(const Structure& aStructure1, const Structure& aStructure2) const =0;
 
 protected:
 	std::string mName;
@@ -31,7 +31,7 @@ class CosineDistance : public DistanceMethod
 {
 public:
 	CosineDistance() {mName = "Cosine distance";}
-	virtual float computeDistance(const Structure& aStructure1, const Structure& aStructure2);
+	virtual float computeDistance(const Structure& aStructure1, const Structure& aStructure2) const;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ class EuclideanDistance : public DistanceMethod
 {
 public:
 	EuclideanDistance() {mName = "Euclidean distance";}
-	virtual float computeDistance(const Structure& aStructure1, const Structure& aStructure2);
+	virtual float computeDistance(const Structure& aStructure1, const Structure& aStructure2) const;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ class MinkowskiDistance : public DistanceMethod
 {
 public:
 	MinkowskiDistance() {mName = "Minkowski (p=1/3) distance";}
-	virtual float computeDistance(const Structure& aStructure1, const Structure& aStructure2);
+	virtual float computeDistance(const Structure& aStructure1, const Structure& aStructure2) const;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

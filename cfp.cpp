@@ -173,7 +173,9 @@ int main(int ac, char **av)
 	// Compute the cutoff distance to use and set it
 	if(cmd.mCutoffDistance > 0)
 	{
-		if(cmd.mVerboseLevel >= 2) std::cerr << "Forced cutoff distance: " << std::fixed << std::setprecision(4) << cmd.mCutoffDistance << std::endl;
+		float computed_cutoff_distance = cfp.computeCutoffDistance();
+		if(cmd.mVerboseLevel >= 2) std::cerr << "Forced cutoff distance: " << std::fixed << std::setprecision(4) << cmd.mCutoffDistance
+			                                 << " (computed: " << std::fixed << std::setprecision(4) << computed_cutoff_distance << ')' << std::endl;
 	}
 	else
 	{
@@ -346,7 +348,7 @@ int main(int ac, char **av)
 			int nparts = (int)cfp.getFingerprintNumSections();
 			dat.write((const char *)&nparts, sizeof(int));
 
-			for(unsigned int s=0; s < (unsigned int)numfp; ++s)
+			for(size_t s=0; s < (size_t)numfp; ++s)
 			{
 				const float* f = cfp.getFingerprint(s);
 				dat.write((const char *)f, sizeof(float)*fplen);
@@ -384,7 +386,7 @@ int main(int ac, char **av)
 		}
 		else
 		{
-			unsigned int nstruct = cfp.getNumActiveStructures();
+			size_t nstruct = cfp.getNumActiveStructures();
 
 			fld << "# AVS field file" << std::endl;
 			fld << "ndim=2        # number of dimensions in the field" << std::endl;
@@ -406,12 +408,12 @@ int main(int ac, char **av)
 		}
 		else
 		{
-			int nstruct = (int)cfp.getNumActiveStructures();
+			int nstruct = static_cast<int>(cfp.getNumActiveStructures());
 			dat.write((const char *)&nstruct, sizeof(int));
 			dat.write((const char *)&nstruct, sizeof(int));
 
-			unsigned int s, v;
-			unsigned int ns = cfp.getNumActiveStructures();
+			size_t s, v;
+			size_t ns = cfp.getNumActiveStructures();
 			for(s=0; s < ns; ++s)
 			{
 				for(v=0; v < ns; ++v)
@@ -437,8 +439,8 @@ int main(int ac, char **av)
 		}
 		else
 		{
-			unsigned int ns = cfp.getNumActiveStructures();
-			unsigned int s, v;
+			size_t ns = cfp.getNumActiveStructures();
+			size_t s, v;
 			std::vector<float> dist;
 			dist.reserve((ns*(ns-1))/2);
 			for(s=0; s < ns-1; ++s)
@@ -451,7 +453,7 @@ int main(int ac, char **av)
 			}
 			std::sort(dist.begin(), dist.end());
 
-			int ndist = (int)dist.size();
+			int ndist = static_cast<int>(dist.size());
 			outsorted.write((const char *)&ndist, sizeof(int));
 
 			std::vector<float>::const_iterator idist;
@@ -503,7 +505,7 @@ int main(int ac, char **av)
 		}
 		
 		// Compute number of values (first element is the number of X values following)
-		std::vector<unsigned int> num_results = analysis.numValues();
+		std::vector<size_t> num_results = analysis.numValues();
 
 		// Output the values on file (well does not make much sense not to have this set)
 		if(cmd.mAnalysisFile)
@@ -610,7 +612,7 @@ int main(int ac, char **av)
 		}
 
 		// Initialize the scatterplot and run it the required number of retries
-		unsigned int npoints = sp.initScatterplot(&cfp);
+		size_t npoints = sp.initScatterplot(&cfp);
 		unsigned int i, j;
 		for(i=0; i < num_retries; ++i)
 		{
@@ -761,9 +763,13 @@ int main(int ac, char **av)
 		if(*p) std::cerr << std::endl << "Error: " << p << std::endl;
 		return 1;
 	}
+	catch (std::exception& e)
+	{
+		std::cerr << std::endl << "Error: Std exception: " << e.what() << std::endl;
+	}
 	catch(...)
 	{
-		std::cerr << std::endl << "Error: Default exception" << std::endl;
+		std::cerr << std::endl << "Error: Catch-all exception" << std::endl;
 		return 1;
 	}
 }

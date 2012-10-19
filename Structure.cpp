@@ -161,15 +161,15 @@ void Structure::serialize(std::ofstream& aStream) const
 	aStream.write((char *)&mFingerprintNumSections, sizeof(unsigned int));
 	if(mFingerprintSectionLen > 0 && mFingerprintNumSections > 0)
 		aStream.write((char *)&mFingerprint[0], sizeof(float)*mFingerprintSectionLen*mFingerprintNumSections);
-	x = mWeights.size();
+	x = static_cast<unsigned int>(mWeights.size());
 	aStream.write((char *)&x, sizeof(unsigned int));
 	if(x) aStream.write((char *)&mWeights[0], sizeof(float)*x);
-	x = mInteratomicDistances.size();
+	x = static_cast<unsigned int>(mInteratomicDistances.size());
 	aStream.write((char *)&x, sizeof(unsigned int));
 	unsigned int i;
 	for(i=0; i < x; ++i)
 	{
-		unsigned int y = mInteratomicDistances[i].size();
+		unsigned int y = static_cast<unsigned int>(mInteratomicDistances[i].size());
 		aStream.write((char *)&y, sizeof(unsigned int));
 		if(y) aStream.write((char *)&mInteratomicDistances[i][0], sizeof(float)*y);
 	}

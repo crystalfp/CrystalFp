@@ -30,7 +30,7 @@ struct CrystalFpAnalysis::CrystalFpAnalysisImpl
 	unsigned int				mAnalysisCategory;
 	AnalysisMethod*				mAnalysisMethodX;
 	AnalysisMethod*				mAnalysisMethodY;
-	unsigned int				mHistNumBins;
+	size_t						mHistNumBins;
 	unsigned int				mStructureIdx;
 	ResultsCache				mCache;
 	bool						mCacheResults;
@@ -108,7 +108,7 @@ const std::vector<std::string> CrystalFpAnalysis::getAnalysisMethodsNames(unsign
 
 bool CrystalFpAnalysis::setAnalysisMethod(unsigned int aAnalysisTypeX, unsigned int aAnalysisTypeY)
 {
-	unsigned int n1 = mPimpl->mSimpleMethodsList.size();
+	unsigned int n1 = static_cast<unsigned int>(mPimpl->mSimpleMethodsList.size());
 	if(aAnalysisTypeX < n1)
 	{
 		if(aAnalysisTypeY >= n1) return false;
@@ -124,7 +124,7 @@ bool CrystalFpAnalysis::setAnalysisMethod(unsigned int aAnalysisTypeX, unsigned 
 		return true;
 	}
 
-	unsigned int n2 = mPimpl->mHistMethodsList.size();
+	unsigned int n2 = static_cast<unsigned int>(mPimpl->mHistMethodsList.size());
 	if(aAnalysisTypeX < (n1+n2))
 	{
 		mPimpl->mAnalysisTypeX = aAnalysisTypeX-n1;
@@ -135,7 +135,7 @@ bool CrystalFpAnalysis::setAnalysisMethod(unsigned int aAnalysisTypeX, unsigned 
 		return true;
 	}
 
-	unsigned int n3 = mPimpl->mSpecialMethodsList.size();
+	unsigned int n3 = static_cast<unsigned int>(mPimpl->mSpecialMethodsList.size());
 	if(aAnalysisTypeX < (n1+n2+n3))
 	{
 		mPimpl->mAnalysisTypeX = aAnalysisTypeX-n1-n2;
@@ -202,9 +202,9 @@ void CrystalFpAnalysis::setNamedParam(const std::string& aName, unsigned int aVa
 }
 
 
-std::vector<unsigned int> CrystalFpAnalysis::numValues(void)
+std::vector<size_t> CrystalFpAnalysis::numValues(void)
 {
-	std::vector<unsigned int> nums;
+	std::vector<size_t> nums;
 
 	if(mPimpl->mAnalysisCategory == CATEGORY_SIMPLE)
 	{
@@ -287,7 +287,7 @@ void CrystalFpAnalysis::getValues(float **aValues) const
 	case CATEGORY_SIMPLE:
 		if(mPimpl->mCacheResults)
 		{
-			unsigned int sz = mPimpl->mAnalysisMethodX->numElements(mCrystalFp);
+			size_t sz = mPimpl->mAnalysisMethodX->numElements(mCrystalFp);
 
 			if(!mPimpl->mCache.retrieveResult(CATEGORY_SIMPLE, mPimpl->mAnalysisTypeX, sz, 0, 0, aValues[0]))
 			{
@@ -311,7 +311,7 @@ void CrystalFpAnalysis::getValues(float **aValues) const
 
 	case CATEGORY_HIST:
 		{
-		unsigned int sz = mPimpl->mAnalysisMethodX->numElements(mCrystalFp);
+		size_t sz = mPimpl->mAnalysisMethodX->numElements(mCrystalFp);
 		float* val = new float[sz];
 		if(mPimpl->mCacheResults)
 		{
@@ -353,12 +353,12 @@ void CrystalFpAnalysis::getValues(float **aValues) const
 
 	case CATEGORY_SPECIAL:
 		{
-			unsigned int na = mPimpl->mAnalysisMethodX->numArrays();
+			size_t na = mPimpl->mAnalysisMethodX->numArrays();
 			for(i=0; i < na; ++i)
 			{
 				if(mPimpl->mCacheResults)
 				{
-					unsigned int sz = mPimpl->mAnalysisMethodX->numElements(mCrystalFp, i);
+					size_t sz = mPimpl->mAnalysisMethodX->numElements(mCrystalFp, i);
 					if(!mPimpl->mCache.retrieveResult(CATEGORY_SPECIAL, mPimpl->mAnalysisTypeX, sz, i, mPimpl->mStructureIdx, aValues[i]))
 					{
 						mPimpl->mAnalysisMethodX->getValues(mCrystalFp, aValues[i], i);

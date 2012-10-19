@@ -17,21 +17,21 @@ namespace cfp_internal
 class AnalysisMethod
 {
 public:
-	AnalysisMethod(const char* aName, const char* aNameHist=0)
+	AnalysisMethod(const char* aName, const char* aNameHist=0) : mName(aName), mNameHist(), mPartSelected(UINT_MAX), mStructureIdx(0)
 	{
-		mName = aName;
+		//mName = aName;
 		if(aNameHist) mNameHist = aNameHist;
-		mPartSelected = UINT_MAX; // All fingerprint parts selected
-		mStructureIdx = 0;
+		//mPartSelected = UINT_MAX; // All fingerprint parts selected
+		//mStructureIdx = 0;
 	}
 	virtual ~AnalysisMethod() {}
 
 	std::string								getName(void) const { return mName; }
 	std::string								getNameHist(void) const { return mNameHist; }
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const =0;
-	virtual unsigned int					numElements(const cfp::CrystalFp* aCfp) const  { return aCfp->getNumActiveStructures(); }
-	virtual unsigned int					numElements(const cfp::CrystalFp* aCfp, unsigned int /*aIdx*/) const  { return aCfp->getNumActiveStructures(); }
-	virtual unsigned int					numArrays(void) const {return 1;}
+	virtual size_t							numElements(const cfp::CrystalFp* aCfp) const  { return aCfp->getNumActiveStructures(); }
+	virtual size_t							numElements(const cfp::CrystalFp* aCfp, unsigned int /*aIdx*/) const  { return aCfp->getNumActiveStructures(); }
+	virtual size_t							numArrays(void) const {return 1;}
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> names; return names; }
 	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { std::vector<std::string> names; return names; }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const =0;
@@ -55,6 +55,7 @@ public:
 	MethodGetIdx() : AnalysisMethod("Index") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 0; }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Index"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -65,6 +66,7 @@ public:
 	MethodGetStep() : AnalysisMethod("Step") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 0; }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Step"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -75,6 +77,7 @@ public:
 	MethodGetEnergy() : AnalysisMethod("Energy per atom", "Per atom energy histogram") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 0 && aCfp->hasEnergies(); }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Energy per atom"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -85,6 +88,7 @@ public:
 	MethodGetCellVolume() : AnalysisMethod("Cell volume per atom", "Per atom cell volume histogram") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 0 && aCfp->hasUnitCell(); }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Cell volume per atom"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -94,8 +98,10 @@ class MethodGetDeltaEnergy : public AnalysisMethod
 public:
 	MethodGetDeltaEnergy() : AnalysisMethod("Per atom energy difference", "Per atom energy difference histogram") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 1 && aCfp->hasEnergies(); }
-	virtual unsigned int					numElements(const cfp::CrystalFp* aCfp) const { unsigned int n = aCfp->getNumActiveStructures(); return (unsigned int)((n*(n-1))/2);}
+	virtual size_t							numElements(const cfp::CrystalFp* aCfp) const { size_t n = aCfp->getNumActiveStructures(); return (n*(n-1))/2;}
+	virtual size_t							numElements(const cfp::CrystalFp* aCfp, unsigned int /*aIdx*/) const  { return numElements(aCfp); }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Per atom energy difference"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -105,8 +111,10 @@ class MethodGetDistances : public AnalysisMethod
 public:
 	MethodGetDistances() : AnalysisMethod("Distances", "Distances histogram") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 1 && aCfp->hasDistanceMatrix(); }
-	virtual unsigned int					numElements(const cfp::CrystalFp* aCfp) const { unsigned int n = aCfp->getNumActiveStructures(); return (unsigned int)((n*(n-1))/2);}
+	virtual size_t							numElements(const cfp::CrystalFp* aCfp) const { size_t n = aCfp->getNumActiveStructures(); return (n*(n-1))/2;}
+	virtual size_t							numElements(const cfp::CrystalFp* aCfp, unsigned int /*aIdx*/) const  { return numElements(aCfp); }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Distance"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -117,6 +125,7 @@ public:
 	MethodGetEnergyFromMin() : AnalysisMethod("Energy per atom from min.", "Energy per atom from min. histogram") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 0 && aCfp->hasEnergies(); }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Energy per atom from min."); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -127,6 +136,7 @@ public:
 	MethodGetDistFromMin() : AnalysisMethod("Distances from min.", "Distances from min. histogram") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 0 && aCfp->hasDistanceMatrix(); }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Distance from min."); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -137,6 +147,7 @@ public:
 	MethodGetPointDepth() : AnalysisMethod("Point depth", "Point depth histogram") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 1 && aCfp->hasFingerprints(); }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Depth"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -148,6 +159,7 @@ public:
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const {
 		return aCfp->getNumActiveStructures() > 1 && aCfp->hasFingerprints() && aCfp->isDiffractionLike() && aCfp->hasUnitCell();}
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Degree of order (F2)"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -159,6 +171,7 @@ public:
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const {
 		return aCfp->getNumActiveStructures() > 1 && aCfp->hasFingerprints() && aCfp->isDiffractionLike() && aCfp->hasUnitCell();}
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Degree of order (F2R2)"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -170,6 +183,7 @@ public:
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const {
 		return aCfp->getNumActiveStructures() > 1 && aCfp->hasFingerprints() && aCfp->isDiffractionLike() && aCfp->hasUnitCell();}
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Quasi-entropy"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 
 private:
@@ -183,6 +197,7 @@ public:
 	MethodGetMinDimension() : AnalysisMethod("Min. dimension", "Min. dimension histogram") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 0  && aCfp->hasFingerprints() && aCfp->isDiffractionLike(); }
 	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> lbl; lbl.push_back("Min. dimension"); return lbl; }
+	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* /*aCfp*/) const { return getLabels(); }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 
@@ -236,10 +251,14 @@ class MethodGetFingerprint : public AnalysisMethod
 public:
 	MethodGetFingerprint() : AnalysisMethod("One fingerprint") {}
 	virtual bool							isValid(const cfp::CrystalFp* aCfp) const { return aCfp->getNumActiveStructures() > 0 && aCfp->hasFingerprints(); }
-	virtual unsigned int					numElements(const cfp::CrystalFp* aCfp, unsigned int /*aIdx*/) const
-												{ return aCfp->getFingerprintSectionLen()*((mPartSelected >= aCfp->getFingerprintNumSections()) ? aCfp->getFingerprintNumSections() : 1);}
-	virtual unsigned int					numArrays(void) const {return 2;}
+	virtual size_t							numElements(const cfp::CrystalFp* aCfp, unsigned int /*aIdx*/) const
+											{
+												return static_cast<size_t>(aCfp->getFingerprintSectionLen()*((mPartSelected >= aCfp->getFingerprintNumSections()) ? aCfp->getFingerprintNumSections() : 1));
+											}
+	virtual size_t							numElements(const cfp::CrystalFp* aCfp) const  { return numElements(aCfp, 0); }
+	virtual size_t							numArrays(void) const {return 2;}
 	virtual const std::vector<std::string>	getLabels(const cfp::CrystalFp* aCfp) const;
+	virtual const std::vector<std::string>	getLabels(void) const { std::vector<std::string> names; return names; }
 	virtual void							getValues(const cfp::CrystalFp* aCfp, float* aValue, unsigned int aIdx=0) const;
 };
 

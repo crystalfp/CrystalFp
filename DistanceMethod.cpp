@@ -16,10 +16,6 @@ namespace cfp_internal
 
 double cbrt(double x)
 {
-	double y;               // Guess
-	double d;               // Last difference of y^3 and x
-	double l;               // The limit for optimal guess
-
 	// Check for simple cases:
 	if(x == 0.)
 		return 0.;
@@ -29,8 +25,9 @@ double cbrt(double x)
 		return -1.;
 	else
 	{
-		double g = fabs(x);	// Do this guess on a positive number
-		l = g * 1E-14;		// Set the limit appropriately
+		double y;               // Guess
+		double g = fabs(x);		// Do this guess on a positive number
+		double l = g * 1E-14;	// The limit for optimal guess
 		// the multiplication with x (its magnitude) should
 		// ensure no infinite loops, at the cost
 		// of some precision on high numbers.
@@ -61,7 +58,7 @@ double cbrt(double x)
 
 		// Improve guess immediately:
 		y = ((x / (y * y)) + 2. * y) / 3.;      // Newton's approx. for new guess
-		d = fabs(y * y * y - x);                // Calculate difference
+		double d = fabs(y * y * y - x);         // Calculate difference (Last difference of y^3 and x)
 		while(l < d)
 		{
 			y = ((x / (y * y)) + 2. * y) / 3.;  // Newton's approx. for new guess
@@ -77,7 +74,7 @@ double cbrt(double x)
 
 using namespace cfp_internal;
 
-float CosineDistance::computeDistance(const Structure& aStructure1, const Structure& aStructure2)
+float CosineDistance::computeDistance(const Structure& aStructure1, const Structure& aStructure2) const
 {
 	unsigned int i;
 	unsigned int nsect1 = aStructure1.mFingerprintNumSections;
@@ -160,9 +157,9 @@ float CosineDistance::computeDistance(const Structure& aStructure1, const Struct
 			double b_norm       = 0.0;
 			for(unsigned int k=0; k < sectlen1; ++k)
 			{
-				one_distance += aStructure1.mFingerprint[i+sectlen1*k] * aStructure2.mFingerprint[j+sectlen1*k];
-				a_norm       += aStructure1.mFingerprint[i+sectlen1*k] * aStructure1.mFingerprint[i+sectlen1*k];
-				b_norm       += aStructure2.mFingerprint[j+sectlen1*k] * aStructure2.mFingerprint[j+sectlen1*k];
+				one_distance += aStructure1.mFingerprint[i*sectlen1+k] * aStructure2.mFingerprint[j*sectlen1+k];
+				a_norm       += aStructure1.mFingerprint[i*sectlen1+k] * aStructure1.mFingerprint[i*sectlen1+k];
+				b_norm       += aStructure2.mFingerprint[j*sectlen1+k] * aStructure2.mFingerprint[j*sectlen1+k];
 			}
 			one_distance /= sqrt(a_norm*b_norm);
 			one_distance = (1. - one_distance)/2.;
@@ -190,7 +187,7 @@ float CosineDistance::computeDistance(const Structure& aStructure1, const Struct
 }
 
 
-float EuclideanDistance::computeDistance(const Structure& aStructure1, const Structure& aStructure2)
+float EuclideanDistance::computeDistance(const Structure& aStructure1, const Structure& aStructure2) const
 {
 	unsigned int i;
 	unsigned int nsect1 = aStructure1.mFingerprintNumSections;
@@ -288,7 +285,7 @@ float EuclideanDistance::computeDistance(const Structure& aStructure1, const Str
 	return (float)distance;
 }
 
-float MinkowskiDistance::computeDistance(const Structure& aStructure1, const Structure& aStructure2)
+float MinkowskiDistance::computeDistance(const Structure& aStructure1, const Structure& aStructure2) const
 {
 	unsigned int i;
 	unsigned int nsect1 = aStructure1.mFingerprintNumSections;

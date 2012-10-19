@@ -64,7 +64,7 @@ public:
 	///
 	/// @exception CrystalFpFatal If analysis method has not been set
 	///
-	std::vector<unsigned int> numValues(void);
+	std::vector<size_t> numValues(void);
 
 	/// Get the labels for the analysis result arrays
 	/// @return The vector of labels

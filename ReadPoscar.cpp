@@ -118,9 +118,18 @@ static bool loadData(int aStep, FILE *aPoscarFp, FILE *aEnergyFp, bool aEnergyIs
 
 		// Add the atom converting coordinates from fractional
 		z[j] = (aAtomZ.size() > k) ? aAtomZ[k] : k+1;
-		coords[3*j+0] = fx*uc[0]+fy*uc[4]+fz*uc[8];
-		coords[3*j+1] = fx*uc[1]+fy*uc[5]+fz*uc[9];
-		coords[3*j+2] = fx*uc[2]+fy*uc[6]+fz*uc[10];
+		if(cartesian)
+		{
+			coords[3*j+0] = fx;
+			coords[3*j+1] = fy;
+			coords[3*j+2] = fz;
+		}
+		else
+		{
+			coords[3*j+0] = fx*uc[0]+fy*uc[4]+fz*uc[8];
+			coords[3*j+1] = fx*uc[1]+fy*uc[5]+fz*uc[9];
+			coords[3*j+2] = fx*uc[2]+fy*uc[6]+fz*uc[10];
+		}
 	}
 
 	// Read the energy, if present and add the structure
@@ -206,7 +215,6 @@ void readPoscarAndEnergies(const char* aFilenamePoscar,
 	if(!aFilenamePoscar)
 	{
 		throw CrystalFpFatal("No files given");
-		return;
 	}
 
 	// Read POSCAR
@@ -215,7 +223,6 @@ void readPoscarAndEnergies(const char* aFilenamePoscar,
 	{
 		fprintf(stderr, "Cannot open POSCAR file %s\n", aFilenamePoscar);
 		throw CrystalFpFatal();
-		return;
 	}
 
 	FILE *fpe = 0;
@@ -225,8 +232,8 @@ void readPoscarAndEnergies(const char* aFilenamePoscar,
 		if(!fpe)
 		{
 			fprintf(stderr, "Cannot open energy file %s\n", aFilenameEnergies);
+			fclose(fpp);
 			throw CrystalFpFatal();
-			return;
 		}
 	}
 

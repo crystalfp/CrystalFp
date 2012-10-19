@@ -13,7 +13,7 @@
 
 using namespace cfp_internal;
 
-void PseudoSNNGrouping::computeConnectionMatrix(unsigned int aNumStructures, const DistanceMatrix& aDistances, unsigned int* aConnection) const
+void PseudoSNNGrouping::computeConnectionMatrix(size_t aNumStructures, const DistanceMatrix& aDistances, unsigned int* aConnection) const
 {
 	// Build the connection matrix
 	for(unsigned int r=0; r < aNumStructures; ++r)
@@ -28,7 +28,7 @@ void PseudoSNNGrouping::computeConnectionMatrix(unsigned int aNumStructures, con
 }
 
 
-void PseudoSNNGrouping::doDepthFirstVisit(unsigned int aIdx, bool *aAssigned, std::set<unsigned int>& aGroups, unsigned int* aConnection, unsigned int aNumStructures) const
+void PseudoSNNGrouping::doDepthFirstVisit(unsigned int aIdx, bool *aAssigned, std::set<unsigned int>& aGroups, unsigned int* aConnection, size_t aNumStructures) const
 {
 	// Assign the node to the connected component
 	aAssigned[aIdx] = true;
@@ -42,7 +42,7 @@ void PseudoSNNGrouping::doDepthFirstVisit(unsigned int aIdx, bool *aAssigned, st
 	}
 }
 
-void PseudoSNNGrouping::doGrouping(unsigned int aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult)
+void PseudoSNNGrouping::doGrouping(size_t aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult)
 {
 	// Compute the connection matrix
 	unsigned int* connection = new unsigned int[aNumStructures*aNumStructures];
@@ -145,8 +145,8 @@ float HierarchicalGrouping::ClusterDistanceSingleLinkage(std::list<HierarchicalG
 														 std::list<HierarchicalGrouping::Node>::iterator& aNj,
 														 const DistanceMatrix& aDistances) const
 {
-	unsigned int leni = aNi->idx.size();
-	unsigned int lenj = aNj->idx.size();
+	size_t leni = aNi->idx.size();
+	size_t lenj = aNj->idx.size();
 	if(leni == 1 && lenj == 1)
 	{
 		return aDistances(aNi->idx[0], aNj->idx[0]);
@@ -154,9 +154,9 @@ float HierarchicalGrouping::ClusterDistanceSingleLinkage(std::list<HierarchicalG
 	else
 	{
 		float dist = FLT_MAX;
-		for(unsigned int i=0; i < leni; ++i)
+		for(size_t i=0; i < leni; ++i)
 		{
-			for(unsigned int j=0; j < lenj; ++j)
+			for(size_t j=0; j < lenj; ++j)
 			{
 				float d = aDistances(aNi->idx[i], aNj->idx[j]);
 
@@ -171,8 +171,8 @@ float HierarchicalGrouping::ClusterDistanceCompleteLinkage(std::list<Hierarchica
 														   std::list<HierarchicalGrouping::Node>::iterator& aNj,
 														   const DistanceMatrix& aDistances) const
 {
-	unsigned int leni = aNi->idx.size();
-	unsigned int lenj = aNj->idx.size();
+	size_t leni = aNi->idx.size();
+	size_t lenj = aNj->idx.size();
 	if(leni == 1 && lenj == 1)
 	{
 		return aDistances(aNi->idx[0], aNj->idx[0]);
@@ -180,9 +180,9 @@ float HierarchicalGrouping::ClusterDistanceCompleteLinkage(std::list<Hierarchica
 	else
 	{
 		float dist = -FLT_MAX;
-		for(unsigned int i=0; i < leni; ++i)
+		for(size_t i=0; i < leni; ++i)
 		{
-			for(unsigned int j=0; j < lenj; ++j)
+			for(size_t j=0; j < lenj; ++j)
 			{
 				float d = aDistances(aNi->idx[i], aNj->idx[j]);
 				if(d > dist) dist = d;
@@ -193,7 +193,7 @@ float HierarchicalGrouping::ClusterDistanceCompleteLinkage(std::list<Hierarchica
 }
 
 
-void HierarchicalGrouping::doGrouping(unsigned int aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult)
+void HierarchicalGrouping::doGrouping(size_t aNumStructures, const DistanceMatrix& aDistances, std::vector< std::set<unsigned int> >& aResult)
 {
 	std::list<Node>::const_iterator n;
 

@@ -15,9 +15,9 @@ public:
 
 	void clear(void) {mCache.clear();}
 
-	void addResult(unsigned int aCategory, unsigned int aMethodIdx, unsigned int aLength, int aId1, int aId2, const float* aOut);
+	void addResult(unsigned int aCategory, unsigned int aMethodIdx, size_t aLength, int aId1, int aId2, const float* aOut);
 
-	bool retrieveResult(unsigned int aCategory, unsigned int aMethodIdx, unsigned int aLength, int aId1, int aId2, float* aOut);
+	bool retrieveResult(unsigned int aCategory, unsigned int aMethodIdx, size_t aLength, int aId1, int aId2, float* aOut);
 
 private:
 	char aKeyTmp[256];
