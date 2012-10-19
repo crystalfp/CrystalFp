@@ -314,8 +314,8 @@ CmdLine::CmdLine(int aCnt, char **aVal, bool aUseDefaultsIfNoArguments)
 		switch(args.OptionId())
 		{
 		case OPT_VERSION:
-			// Get the last commit date from Git using: git log -n -pretty=format:"%ci"
-			std::cerr << "CrystalFp library and driver: " << "2011-07-03 06:59:30 +0200" << std::endl;
+			// Get the last commit date from Git using: git log -n 1 --pretty=format:"%ci"
+			std::cerr << "CrystalFp library and driver: " << "2012-10-19 12:59:56 +0200" << std::endl;
 			throw CmdLineSuccess();
 
 		case OPT_VERBOSE:
