@@ -200,7 +200,9 @@ void HierarchicalGrouping::doGrouping(size_t aNumStructures, const DistanceMatri
 	// Initialize root (to point to all)
 	std::list<Node> root;
 	for(unsigned int i=0; i < aNumStructures; ++i) root.push_back(Node(i));
+#ifdef TRACE_GROUPING
 	float curr_min = 0.0F;
+#endif
 
 	// Iterate till the distance becomes greather than the given threshold
 	for(; root.size() > 1;)
@@ -247,8 +249,10 @@ void HierarchicalGrouping::doGrouping(size_t aNumStructures, const DistanceMatri
 		// Exit if the threshold has been reached
 		if(min_dist > mMaxDistanceForGrouping) break;
 
+#ifdef TRACE_GROUPING
 		// Update min distance
 		curr_min = min_dist;
+#endif
 
 		// Update the group list. Merge node j at the end of node i
 		min_i->Merge(min_j);

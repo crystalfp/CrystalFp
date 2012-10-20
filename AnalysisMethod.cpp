@@ -108,7 +108,7 @@ void MethodGetDistFromMin::getValues(const cfp::CrystalFp* aCfp, float* aValue, 
 {
 	size_t idx;
 	float min_energy = FLT_MAX;
-	size_t min_idx;
+	size_t min_idx   = 0;
 	for(idx=0; idx < aCfp->getNumActiveStructures(); ++idx)
 	{
 		float e = aCfp->getPerAtomEnergy(idx);
